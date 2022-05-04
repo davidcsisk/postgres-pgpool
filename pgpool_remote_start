@@ -1,0 +1,12 @@
+#!/bin/bash -x
+exec &>> /var/lib/pgsql/.pgpool_remote_start.log
+printf "`date`: Remote startup issued from `hostname`...\n"
+
+remote_host=$1
+remote_pgdata=$2
+
+# Start recovery target PostgreSQL server. Note: the redirects are necessary to prevent ssh race condition
+ssh -qT $remote_host "source .bash_profile; pg_ctl -w -D $remote_pgdata start > /dev/null 2>&1 < /dev/null &"
+
+printf "`date`: Remote startup completed...\n\n"
+
